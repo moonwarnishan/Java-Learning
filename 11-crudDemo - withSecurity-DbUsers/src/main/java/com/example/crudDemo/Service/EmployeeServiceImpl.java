@@ -1,10 +1,14 @@
 package com.example.crudDemo.Service;
 
 //import com.example.crudDemo.dao.EmployeeDAO;
+import com.example.crudDemo.Exceptions.EmployeeAlreadyExistException;
+import com.example.crudDemo.Exceptions.EmployeeNotFoundException;
 import com.example.crudDemo.dao.EmployeeRepository;
 import com.example.crudDemo.entity.Employee;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.rmi.AlreadyBoundException;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +45,7 @@ public class EmployeeServiceImpl implements EmployeeService{
     employeeDAO.delete(id);
     }
 }*/
+//@Service
 @Service
 public class EmployeeServiceImpl implements EmployeeService{
     private final EmployeeRepository employeeRepository;
@@ -56,12 +61,22 @@ public class EmployeeServiceImpl implements EmployeeService{
 
     @Override
     public Optional<Employee> getById(int employeeId) {
-        return employeeRepository.findById(employeeId);
+        Optional<Employee> emp = employeeRepository.findById(employeeId);
+        if(emp.isEmpty())
+        {
+            throw new EmployeeNotFoundException("Employee Not Found");
+        }
+        return emp;
     }
 
     @Override
     public void add(Employee employee) {
-        employeeRepository.save(employee);
+        Optional<Employee> emp = employeeRepository.findByEmail(employee.getEmail());
+        if(emp.isEmpty())
+        {
+            employeeRepository.save(employee);
+        }
+        throw new EmployeeAlreadyExistException("Employee With this email already Exist");
     }
 
     @Override
@@ -74,7 +89,7 @@ public class EmployeeServiceImpl implements EmployeeService{
         var emp = getById(id);
         if(emp.isEmpty())
         {
-            throw new RuntimeException("Not Found");
+            throw new EmployeeNotFoundException("Employee Not Found");
         }
         emp.ifPresent(employeeRepository::delete);
     }

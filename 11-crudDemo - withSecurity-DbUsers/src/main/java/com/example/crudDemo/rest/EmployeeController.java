@@ -2,6 +2,7 @@ package com.example.crudDemo.rest;
 
 import com.example.crudDemo.Service.EmployeeService;
 import com.example.crudDemo.entity.Employee;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
